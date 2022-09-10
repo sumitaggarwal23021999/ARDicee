@@ -1,9 +1,3 @@
-//
-//  ViewController.swift
-//  ARDicee
-//
-//  Created by Sumit Aggarwal  on 04/09/22.
-//
 
 import UIKit
 import SceneKit
