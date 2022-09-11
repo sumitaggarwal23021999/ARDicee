@@ -132,6 +132,19 @@ class ViewController: UIViewController {
         )
     }
     
+    //MARK: Romove All Dice from screen
+    private func deleteAllDice() {
+        if !diceArray.isEmpty {
+            for dice in diceArray {
+                dice.removeFromParentNode()
+            }
+        }
+    }
+    
+    @IBAction func removeAllDice(_ sender: Any) {
+        deleteAllDice()
+    }
+    
     @IBAction func rollAgain(_ sender: UIBarButtonItem) {
         rollAll()
     }
