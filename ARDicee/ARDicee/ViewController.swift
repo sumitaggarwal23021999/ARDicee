@@ -82,16 +82,33 @@ class ViewController: UIViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let touch = touches.first {
             let touchLocation = touch.location(in: sceneView)
+            
+            //We get touchLocation in @D so we converted it in 3D using below function and checked if we tap on our created plane or outside of plane.
             let results = sceneView.hitTest(touchLocation, types: .existingPlaneUsingExtent)
             if let hitResult = results.first {
                 debugPrint("Touched on plane")
                 debugPrint(hitResult)
                 let diceScene = SCNScene(named: "art.scnassets/diceCollada.scn")!
                 if let diceNode = diceScene.rootNode.childNode(withName: "Dice", recursively: true) {
+                    
+                    //In hitResults we have position where we tapped to we get that position
+                    //We have added "diceNode.boundingSphere.radius" in Y position because we need to show dice on the plane not in between plane axis
                     diceNode.position = SCNVector3(x: hitResult.worldTransform.columns.3.x,
                                                    y: hitResult.worldTransform.columns.3.y + diceNode.boundingSphere.radius,
                                                    z: hitResult.worldTransform.columns.3.z)
                     sceneView.scene.rootNode.addChildNode(diceNode)
+                    
+                    //Now we are going to add rotation and animation and showing a random number on dice
+                    //Here we are getting only X and Z random values because in case we move dice in Y axis it will not change face.
+                    let randomX = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
+                    let randomZ = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
+                    
+                    diceNode.runAction(SCNAction.rotateBy(
+                        x: CGFloat(randomX * 5),
+                        y: 0,
+                        z: CGFloat(randomZ * 5),
+                        duration: 0.5)
+                    )
                 }
             } else {
                 debugPrint("You tapped outside of plane")
