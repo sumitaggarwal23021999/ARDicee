@@ -12,7 +12,7 @@ class ViewController: UIViewController {
         
         // Set the view's delegate
         sceneView.delegate = self
-        self.sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
+        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
         
         //MARK: Craeting of a cube
 //        let cube = SCNBox(width: 0.1, height: 0.1, length: 0.1, chamferRadius: 0.01)
@@ -76,6 +76,27 @@ class ViewController: UIViewController {
         
         // Pause the view's session
         sceneView.session.pause()
+    }
+    
+    //MARK: Method to determine touch in real world
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let touch = touches.first {
+            let touchLocation = touch.location(in: sceneView)
+            let results = sceneView.hitTest(touchLocation, types: .existingPlaneUsingExtent)
+            if let hitResult = results.first {
+                debugPrint("Touched on plane")
+                debugPrint(hitResult)
+                let diceScene = SCNScene(named: "art.scnassets/diceCollada.scn")!
+                if let diceNode = diceScene.rootNode.childNode(withName: "Dice", recursively: true) {
+                    diceNode.position = SCNVector3(x: hitResult.worldTransform.columns.3.x,
+                                                   y: hitResult.worldTransform.columns.3.y + diceNode.boundingSphere.radius,
+                                                   z: hitResult.worldTransform.columns.3.z)
+                    sceneView.scene.rootNode.addChildNode(diceNode)
+                }
+            } else {
+                debugPrint("You tapped outside of plane")
+            }
+        }
     }
 }
 
