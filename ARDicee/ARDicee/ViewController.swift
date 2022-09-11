@@ -5,6 +5,8 @@ import ARKit
 
 class ViewController: UIViewController {
 
+    var diceArray: [SCNNode] = []
+    
     @IBOutlet var sceneView: ARSCNView!
     
     override func viewDidLoad() {
@@ -96,24 +98,47 @@ class ViewController: UIViewController {
                     diceNode.position = SCNVector3(x: hitResult.worldTransform.columns.3.x,
                                                    y: hitResult.worldTransform.columns.3.y + diceNode.boundingSphere.radius,
                                                    z: hitResult.worldTransform.columns.3.z)
+                    diceArray.append(diceNode)
                     sceneView.scene.rootNode.addChildNode(diceNode)
-                    
-                    //Now we are going to add rotation and animation and showing a random number on dice
-                    //Here we are getting only X and Z random values because in case we move dice in Y axis it will not change face.
-                    let randomX = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
-                    let randomZ = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
-                    
-                    diceNode.runAction(SCNAction.rotateBy(
-                        x: CGFloat(randomX * 5),
-                        y: 0,
-                        z: CGFloat(randomZ * 5),
-                        duration: 0.5)
-                    )
+                    roll(dice: diceNode)
                 }
             } else {
                 debugPrint("You tapped outside of plane")
             }
         }
+    }
+    
+    //MARK: method to roll all dice with a function tap
+    private func rollAll() {
+        if !diceArray.isEmpty {
+            for dice in diceArray {
+                roll(dice: dice)
+            }
+        }
+    }
+    
+    //MARK: Method to handle roll of dice
+    private func roll(dice: SCNNode) {
+        //Now we are going to add rotation and animation and showing a random number on dice
+        //Here we are getting only X and Z random values because in case we move dice in Y axis it will not change face.
+        let randomX = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
+        let randomZ = Float(arc4random_uniform(4) + 1) * (Float.pi/2)
+        
+        dice.runAction(SCNAction.rotateBy(
+            x: CGFloat(randomX * 5),
+            y: 0,
+            z: CGFloat(randomZ * 5),
+            duration: 0.5)
+        )
+    }
+    
+    @IBAction func rollAgain(_ sender: UIBarButtonItem) {
+        rollAll()
+    }
+    
+    //MARK: Handling of phone shaking
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        rollAll()
     }
 }
 
